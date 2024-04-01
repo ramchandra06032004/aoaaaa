@@ -1,0 +1,73 @@
+#include<stdio.h>
+#include<conio.h>
+#define INF 999999
+#define N 4
+
+void copy_array(int n, int src[], int dest[]) {
+    int i;
+    for(i=0; i<n; i++)
+	dest[i] = src[i];
+}
+
+int first_unvisited(int n, int visited[]) {
+    int i;
+    for(i=0; i<n; i++)
+	if(!visited[i])
+	    return i;
+    return -1;
+}
+
+void tsp(int n, int graph[N][N], int v, int visited[], int nodesVisited, int path[], int pathIndex, int* pathCost, int* minCost) {
+    int i;
+    visited[v] = 1;
+    nodesVisited++;
+    path[pathIndex++] = v;
+
+    if(nodesVisited == n) {
+	if(graph[v][0] && *pathCost + graph[v][0] < *minCost) {
+	    *minCost = *pathCost + graph[v][0];
+	    copy_array(n, path, path);
+	}
+    }
+
+    for(i=0; i<n; i++) {
+	if(!visited[i] && graph[v][i]) {
+	    *pathCost += graph[v][i];
+	    tsp(n, graph, i, visited, nodesVisited, path, pathIndex, pathCost, minCost);
+	    *pathCost -= graph[v][i];
+	}
+    }
+
+    visited[v] = 0;
+}
+
+int main() {
+    int graph[N][N] = {
+	{0,22,26 , 30},
+	{30, 0, 45, 35},
+	{25, 45, 0, 60},
+	{30, 35, 40, 0}
+    };
+
+    int visited[N];
+    int path[N];
+    int minCost = INF;
+    int pathCost = 0;
+    int i;
+
+    clrscr();
+    for(i=0; i<N; i++)
+	visited[i] = 0;
+
+    tsp(N, graph, 0, visited, 0, path, 0, &pathCost, &minCost);
+
+    printf("Minimum cost : %d\n", minCost);
+    printf("Path : ");
+    for(i=0; i<N; i++)
+	printf("%d ", path[i]);
+    printf("0\n");
+
+    getch();
+
+    return 0;
+}
